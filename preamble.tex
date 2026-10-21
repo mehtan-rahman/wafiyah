@@ -1,0 +1,485 @@
+% ------------------------------------------------------------------
+%  wafiyah — critical edition (tahqiq) preamble
+%  Engine: XeLaTeX.  Build: make  (or: latexmk -xelatex main.tex)
+% ------------------------------------------------------------------
+\usepackage[paperwidth=116mm,paperheight=180mm,top=17mm,bottom=8mm,left=8mm,right=8mm,headheight=14pt,headsep=4mm,footskip=8mm]{geometry}
+\usepackage{fancyhdr,tikz}
+%  Page in the manner of the lithograph: double rule around text block + header strip, page number
+%  box top-left; the current chapter is named at the right of the header strip
+\newlength{\framepad}\setlength{\framepad}{3mm}
+%  (drawn from the running head, because bidi's shipout patches swallow eso-pic pictures)
+\newcommand{\pageframe}{\begin{tikzpicture}[remember picture,overlay,line width=0.5pt]
+    \coordinate (sw) at ([shift={(1in+\hoffset+\oddsidemargin-\framepad, \paperheight-1in-\voffset-\topmargin-\headheight-\headsep-\textheight-\framepad)}]current page.south west);
+    \coordinate (ne) at ([shift={(1in+\hoffset+\oddsidemargin+\textwidth+\framepad, \paperheight-1in-\voffset-\topmargin+\framepad)}]current page.south west);
+    \draw (sw) rectangle (ne);
+    \draw[line width=0.3pt] ([shift={(-1.4pt,-1.4pt)}]sw) rectangle ([shift={(1.4pt,1.4pt)}]ne);
+  \end{tikzpicture}}
+\tolerance=2000 \emergencystretch=1.5em   % narrow two-column prose: allow looser lines rather than overfull ones
+\makeatletter
+\def\currentbab{}
+\newcommand{\runninghead}{{\def\\{ }\let\com\@firstoftwo\let\tq\@firstoftwo\let\corr\@secondoftwo\let\unclear\@firstofone
+  \footnotesize\currentbab}}
+\makeatother
+\pagestyle{fancy}\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\pageframe\thepage\hspace{.6em}\vrule height 11pt depth 5pt}  % number box, top-left as in the original
+\fancyhead[R]{\runninghead}
+%  front matter: the same frame, without number box or header rule
+\fancypagestyle{frontframe}{\fancyhf{}\fancyhead[L]{\pageframe}\renewcommand{\headrulewidth}{0pt}}
+
+\usepackage{graphicx}
+\usepackage{pict2e}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage[table]{xcolor}   % (before polyglossia/bidi) grey header cells
+\definecolor{headgrey}{gray}{0.84}
+\usepackage{etoolbox}
+\usepackage{ifthen}
+\usepackage{pgffor}
+
+% ---------- facsimile switch -------------------------------------
+%  \facsimiletrue  -> each transcribed page is preceded by its scan
+\newif\iffacsimile
+\facsimilefalse
+\IfFileExists{facsimile.cfg}{\input{facsimile.cfg}}{}
+
+% ---------- critical apparatus (reledmac) -------------------------
+\usepackage[series={A,B}]{reledmac}
+\usepackage{reledpar}
+\setRlineflag{ي}   % line numbers of the right column carry ي in the apparatus
+\firstlinenumR{100000}\linenumincrementR{5}   % reledpar columns: no margin numbers either
+\Xarrangement[A]{twocol}         % apparatus A: variants / ms readings (two columns: the notes are short, and their height is measured exactly)
+\Xbhooknote[A]{\hfill\beginR}   % (reledmac sets twocol notes left-to-right otherwise)
+\Xbhooknote[B]{\setRL\beginR}
+\Xarrangement[B]{normal}         % apparatus B: editor's commentary (own paragraph each: these notes can be long)
+%  one short rule above the apparatus, on the right (the start of an Arabic page)
+\Xonlyonerule
+\makeatletter
+\newcommand{\rtlnoterule}{\kern-3pt\hbox to\hsize{\if@RTL\hfill\vrule width 28mm height .4pt\else\vrule width 28mm height .4pt\hfill\fi}\kern 2.6pt}
+\makeatother
+\AtBeginDocument{\let\Afootnoterule\rtlnoterule\let\Bfootnoterule\rtlnoterule}
+\Xlemmaseparator[A]{]}
+\Xlemmaseparator[B]{]}
+\firstlinenum{100000}\linenumincrement{5}  % no line numbers in the margin (the lithograph has none); the apparatus still cites lines
+\Xnotenumfont{\normalfont}
+\Xnotefontsize{\fontsize{8}{12}\selectfont}   % apparatus: room between lines for the vowel marks
+\linenummargin{right}
+
+
+% ---------- fonts & languages (polyglossia + bidi) ----------------
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage[numerals=maghrib]{arabic}  % western digits internally; fonts map them to ١٢٣
+\setotherlanguage{urdu}
+\setotherlanguage{english}
+\defaultfontfeatures{Ligatures=TeX}
+%  Arabic text: Scheherazade New (SIL, OFL; in fonts/), designed for fully vowelled text
+\IfFileExists{./fonts/ScheherazadeNew-Regular.ttf}{\def\fontdir{fonts/}}{\def\fontdir{../fonts/}}   % (make check runs in build/)
+\newcommand{\arabicfontspec}{Script=Arabic,Scale=0.98,Mapping=arabicdigits,Path=\fontdir,
+  UprightFont=ScheherazadeNew-Regular.ttf,BoldFont=ScheherazadeNew-Bold.ttf}
+\expandafter\newfontfamily\expandafter\arabicfont\expandafter[\arabicfontspec]{ScheherazadeNew}
+\expandafter\newfontfamily\expandafter\arabicfontsf\expandafter[\arabicfontspec]{ScheherazadeNew}
+\newfontfamily\urdufont[Script=Arabic,Scale=1.0,Mapping=farsidigits]{Noto Nastaliq Urdu}
+\expandafter\setmainfont\expandafter[\arabicfontspec]{ScheherazadeNew}
+\newfontfamily\latinfont{texgyrepagella-regular.otf}
+%  figures at 85%: bidi already puts 0–9 in their own XeTeX character class
+\makeatletter
+\newcommand{\digitsize}{\fontsize{\fpeval{.85*\f@size}}{\f@baselineskip}\selectfont}
+\XeTeXinterchartoks 0 \bidi@digits@charclass = {\begingroup\digitsize}
+\XeTeXinterchartoks 4095 \bidi@digits@charclass = {\begingroup\digitsize}
+\XeTeXinterchartoks \bidi@digits@charclass 0 = {\endgroup}
+\XeTeXinterchartoks \bidi@digits@charclass 4095 = {\endgroup}
+\XeTeXinterchartoks \bidi@digits@charclass \bidi@sepmark@charclass = {\endgroup}
+\XeTeXinterchartoks \bidi@sepmark@charclass \bidi@digits@charclass = {\DigitsDotDashInterCharToks\begingroup\digitsize}
+\makeatother
+
+% ---------- title (p.1) ------------------------------------------
+%  the title وافیہ in bold Nastaliq (the lithograph's own title is a bold Nastaliq hand, matching
+%  the Urdu lines around it), inside a double oval as on the lithograph's title page
+\newfontfamily\titlenastaliq[Script=Arabic]{Noto Nastaliq Urdu Bold}
+\newcommand{\wafiyahtitle}{\begin{tikzpicture}
+  \node[inner sep=0] at (0,0.12) {\titlenastaliq\fontsize{66}{66}\selectfont وافیہ};
+  \draw[line width=1.3pt] (0,0) ellipse (3.0 and 1.75);
+  \draw[line width=.45pt] (0,0) ellipse (2.86 and 1.61);
+  \end{tikzpicture}}
+
+%  a small typographic ornament (title page, key)
+\newcommand{\ornament}{{\color{black!60}\rule[.5ex]{12mm}{.3pt}\hspace{2mm}\raisebox{-.2ex}{\large ۞}\hspace{2mm}\rule[.5ex]{12mm}{.3pt}}}
+
+% ---------- editorial macros --------------------------------------
+%  Printed-page marker: \mspage{5} puts ص٥ in the margin and starts
+%  a fresh reledmac numbering block so every note cites page+line.
+%  Numbering is started lazily at the first \pstart of a page (so that pages whose text
+%  is entirely in two-column mode, which numbers each column itself, work too).
+\newif\ifmsnumbering \newif\ifmspending
+\newcommand{\ensurenumbering}{\ifmspending\beginnumbering\global\mspendingfalse\global\msnumberingtrue\fi}
+\let\reledmacpstart\pstart
+\renewcommand{\pstart}{\ensurenumbering\reledmacpstart}
+%  Environments that open a numbered paragraph must start the numbering OUTSIDE their own
+%  group (reledmac's \beginnumbering/\endnumbering must pair at one group level):
+\makeatletter
+\newcommand{\envensurenumbering}[1]{\endgroup\ensurenumbering\begingroup\def\@currenvir{#1}}
+\makeatother
+\newcommand{\finishnumbering}{\ifmsnumbering\endnumbering\global\msnumberingfalse\fi\global\mspendingfalse}
+\newcommand{\mspage}[1]{%
+  \finishnumbering
+  \recordpagefree
+  \ifnumgreater{\value{mspages}}{0}{\clearpage}{}%
+  \stepcounter{mspages}%
+  \iffacsimile\facsimilepage{#1}\fi
+  \markpagestart
+  \global\mspendingtrue
+  \normalsize\gdef\pagefontsize{}\gdef\sarfreserve{5}\global\hairlinestrue%   undo a previous page's \densepage / \tablereserve
+  \setcounter{page}{#1}%
+  \write\msmap{#1 \themsabspage}%
+}
+\newcounter{mspages}
+%  \densepage{9} right after \mspage: set this page's prose at 9pt (leading 1.25×), for the pages
+%  the lithograph packs tighter than the frame allows at full size (tables are scaled anyway)
+\newcommand{\densepage}[1]{\gdef\pagefontsize{#1}\fontsize{#1}{\dimexpr#1pt*5/4\relax}\selectfont}
+\def\pagefontsize{}
+%  (column boxes start a fresh minipage, so they re-apply the page's size)
+\newcommand{\usepagefontsize}{\ifx\pagefontsize\empty\else\fontsize{\pagefontsize}{\dimexpr\pagefontsize pt*5/4\relax}\selectfont\fi}
+\newwrite\msmap\immediate\openout\msmap=\jobname.map   % 'printed page  absolute pdf page' map (should be N N)
+\newcounter{msabspage}\AddToHook{shipout/before}{\stepcounter{msabspage}}
+\newcommand{\facsimilepage}[1]{%
+  \begin{center}\includegraphics[height=.92\textheight]{scans/p\padthree{#1}}\end{center}%
+  \clearpage}
+\makeatletter
+\def\three@digits#1{\ifnum#1<10 00#1\else\ifnum#1<100 0#1\else#1\fi\fi}
+\let\padthree\three@digits
+%  input pages/p001.tex … p084.tex in order, without a group around each page
+%  (the column environments manipulate groups, so a \foreach loop must not be used)
+\newcount\msloop
+\newcommand{\inputpages}{\global\msloop=1 \inputpages@loop}
+\def\inputpages@one{\IfFileExists{pages/p\three@digits{\the\msloop}.tex}{\input{pages/p\three@digits{\the\msloop}}}{}}
+\def\inputpages@loop{\ifnum\msloop>84 \expandafter\@gobble\else\expandafter\@firstofone\fi
+  {\inputpages@one\global\advance\msloop 1 \inputpages@loop}}
+\makeatother
+
+%  Chapter:  \bab{الباب الأول في الصرف الصغير}
+\newcommand{\bab}[1]{\gdef\currentbab{#1}\ignorespaces}   % the chapter is named in the header strip only
+%  Sub-heading inside a page (e.g. اسم آلة, قانون, تمرين)
+\newcommand{\subbab}[1]{\ifincol{\par\centering\bfseries #1\par}\else\pstart\centering\bfseries #1\par\pend\fi}
+
+%  --- apparatus entries (use INSIDE \pstart…\pend or inside tables) ---
+%  \tq{lemma}{note}        -> lemma in text, note in apparatus A (variants)
+%  \corr{ms}{emended}      -> emended reading in text; ms reading in apparatus A
+%  \com{lemma}{commentary} -> commentary in apparatus B (editor's notes)
+%  \unclear{reading}       -> flagged uncertain reading (dagger + apparatus A)
+%  \gap                    -> illegible / blank cell in the lithograph
+\newcommand{\tq}[2]{\edtext{#1}{\Afootnote{#2}}}
+\newcommand{\corr}[2]{\edtext{#2}{\Afootnote{في الأصل: #1}}}
+\newcommand{\com}[2]{\edtext{#1}{\Bfootnote{#2}}}
+\newcommand{\unclear}[1]{\edtext{#1}{\Afootnote{غير واضحة في الأصل}}\textsuperscript{\latinfont†}}
+\newcommand{\gap}{\textcolor{gray}{[\,…\,]}}
+
+%  --- table helpers ---
+%  \x      -> the × the lithograph uses for a non-existent form
+%  \ditto  -> the ditto mark (〃) meaning "as above"
+%  \ilkh   -> الخ (etc.)
+%  \twoline{اسم ظرف}{زمان ومكان} -> a label set on two lines inside one cell, as the lithograph does
+%  \vlabel{5}{ثلاثي مزيد}{بحرفين} -> a group label written vertically (as in the lithograph) beside
+%  the 5 rows of its group
+\newsavebox{\vlabelbox}
+\makeatletter
+%  (colortbl paints each row's cell after the row above, so the label is set in the LAST row of its
+%  group with a negative \multirow count; the other rows of the group get a grey cell: \vgrey)
+\newcommand{\vgrey}{\global\sarfcellkind\tw@\cellcolor{headgrey}}
+\newcommand{\vlabel}[3]{\global\sarfcellkind\tw@
+  \sbox{\vlabelbox}{\bfseries\ifnum#1>2\small\else\footnotesize\fi\ifnum#1>2 \beginR #2 #3\endR\else\twoline{\beginR #2\endR}{\beginR #3\endR}\fi}%
+  \sbox{\vlabelbox}{\rotatebox{-90}{\usebox{\vlabelbox}}}%
+  \hbox to\wd\vlabelbox{\hss\multirow{-#1}{*}{\makebox[0pt]{\raisebox{\dimexpr(\dp\vlabelbox-\ht\vlabelbox)/2+\sarfinkcentre\relax}[0pt][0pt]{\usebox{\vlabelbox}}}}\hss}%   (zero-width, centred in the cell)
+  \cellcolor{headgrey}}%   (after the label: its inner tabular resets the cell colour)
+%  a two-line label in a single row, grey and centred on the row: \hlabel{رباعي}{مجرد}
+\newcommand{\hlabel}[2]{\global\sarfcellkind\tw@
+  \sbox{\vlabelbox}{\sarfplaincr\footnotesize\bfseries\renewcommand{\arraystretch}{1}\begin{tabular}{@{}c@{}}#1\\#2\end{tabular}}%
+  \dimen@=\dimexpr\sarfinkcentre-(\ht\vlabelbox-\dp\vlabelbox)/2\relax
+  \raisebox{\dimen@}[\dimexpr\ht\vlabelbox+\dimen@+4pt\relax][\dimexpr\dp\vlabelbox-\dimen@+4pt\relax]{\usebox{\vlabelbox}}%   (the row grows evenly, with room for the vowel marks)
+  \cellcolor{headgrey}}
+\makeatother
+%  \grouprow{7}{ثلاثي مزيد بحرف} -> a heading across the whole table for the group of rows below it
+\definecolor{groupgrey}{gray}{0.93}
+\newcommand{\grouprow}[2]{\multicolumn{#1}{c}{\cellcolor{groupgrey}\small\bfseries #2}\\\midrule}
+\newcommand{\twoline}[2]{{\sarfplaincr\renewcommand{\arraystretch}{1.25}\begin{tabular}{@{}c@{}}#1\\#2\end{tabular}}}
+%  a ditto / الخ after a form is pushed to the far edge of its cell, so that down a column they
+%  stand in one line as in the lithograph (a ditto alone in a cell stays centred)
+\makeatletter
+\newcommand{\x}{\global\sarfcellkind\tw@\hfil{\color{gray}\latinfont\texttimes}\hfil}   % (always alone in its cell: centred)
+\newcommand{\dittomark}[1]{\ifsarfboxed
+    \ifdim\lastskip>\z@\unskip\global\setbox\sarfdittobox\hbox{#1}\global\sarfcellkind\thr@@\else\global\sarfcellkind\tw@#1\fi
+  \else\ifhmode\ifdim\lastskip>\z@\unskip\hfill\hspace{.3em}#1\else\hfil#1\hfil\fi\else#1\fi\fi}
+\makeatother
+\newcommand{\ditto}{\dittomark{\raisebox{.3ex}{\color{gray}\latinfont\small″}}}
+\newcommand{\ilkh}{\dittomark{{\footnotesize الخ}}}
+\renewcommand{\arraystretch}{1.25}
+\setlength{\tabcolsep}{5pt}
+%  Table title row helper:  \thead{ماضي معروف}
+%  a leading column number, \thead{(19) مثال واوي}, is set beside the title as a small circled
+%  figure, like the lithograph's ①②
+\makeatletter
+\newcommand{\thead}[1]{\thead@i#1\relax}
+\def\thead@i{\@ifnextchar({\thead@num}{\thead@plain}}
+\newcommand{\theadlift}{.12em}
+\def\thead@plain#1\relax{\global\sarfcellkind\@ne\cellcolor{headgrey}\hfil\raisebox{\theadlift}{\footnotesize\bfseries #1}\hfil}
+\def\thead@num(#1)#2\relax{\global\sarfcellkind\@ne\cellcolor{headgrey}\hfil\raisebox{\theadlift}{\colnum{#1}\,{\footnotesize\bfseries\ignorespaces#2}}\hfil}
+%  (drawn with pict2e, not TikZ: TikZ pictures would upset the numbering of the page frames,
+%  which are placed with remember picture)
+\newcommand{\colnum}[1]{{\setlength{\unitlength}{1pt}\linethickness{.3pt}\sbox0{\fontsize{6.5}{7}\selectfont #1}%
+  \begin{picture}(11.5,8)(0,-2.2)\put(5.75,1.9){\color{black!55}\circle{10.6}}\put(5.75,1.9){\makebox(0,0){\usebox0}}\end{picture}}}
+\makeatother
+%  Standard conjugation table: \begin{sarf}{|c|c|c|} ... \end{sarf}
+%  (columns are given right-to-left, as read on the page)
+%  The table is set in a box; if it is wider than the text width it is scaled down to fit
+%  (the lithograph's pages are denser than A5 allows at full size).
+%  booktabs look: no vertical rules (the | in column specs are kept but drawn at zero width),
+%  \hline -> \midrule, \cline{a-b} -> \cmidrule(lr){a-b}, heavy rules at top and bottom
+\setlength{\aboverulesep}{0pt}\setlength{\belowrulesep}{0pt}  % no white bands between colour and rules
+\newcommand{\booktabsrules}{\setlength{\arrayrulewidth}{0pt}\let\hline\midrule
+  \renewcommand{\cline}[1]{\cmidrule{##1}}}
+%  light hairline under every row, as the lithograph rules its rows (\nohairlines after \mspage
+%  switches them off for a page whose tables have \multirow cells, which a hairline would cut)
+\definecolor{hairgrey}{gray}{0.7}
+\newif\ifhairlines \hairlinestrue
+\newcommand{\nohairlines}{\global\hairlinesfalse}
+\makeatletter
+%  (\\ of a tabular is \@arraycr, so the row end is wrapped before the tabular starts; nested
+%  helper tabulars undo it with \sarfplaincr)
+\protected\def\sarf@hcr{\sarf@origcr\noalign{\global\sarfcol\z@}\ifhairlines\expandafter\sarf@hair\fi}
+\newcommand{\sarfhairlines}{\ifx\@arraycr\sarf@hcr\else\let\sarf@origcr\@arraycr\let\@arraycr\sarf@hcr\fi}
+\newcommand{\sarfplaincr}{\ifx\@arraycr\sarf@hcr\let\@arraycr\sarf@origcr\fi}
+\def\sarf@hair{\arrayrulecolor{hairgrey}\specialrule{.25pt}{0pt}{0pt}\arrayrulecolor{black}}
+\makeatother
+%  array's row strut puts 70% of the row height above the baseline (right for Latin capitals);
+%  Arabic letters sit lower, so the strut is re-split evenly around the text's visual centre,
+%  \sarfinkcentre above the baseline (measured on vowelled body rows; header text, which has no
+%  vowel marks, is raised by \theadlift to match)
+\newcommand{\sarfinkcentre}{.32em}
+\makeatletter
+\newdimen\sarf@rowht
+\newcommand{\sarfcentre}{\noalign{\global\sarf@rowht=\dimexpr\ht\@arstrutbox+\dp\@arstrutbox\relax
+  \global\setbox\@arstrutbox\hbox{\vrule\@height\dimexpr\sarf@rowht/2+\sarfinkcentre\relax
+    \@depth\dimexpr\sarf@rowht/2-\sarfinkcentre\relax\@width\z@}}}
+\makeatother
+%  body cells: the forms of a column share one starting (right) edge, so that particles such as
+%  لا / لم / ما line up, and the block of forms as a whole is centred in the column.  Each centred column of a table is
+%  set boxed; widths are measured on one pass (\sarfcolinfo in the .aux) and used on the next.
+%  Headers, lone ditto marks and × stay centred; a ditto after a form goes to the far edge.
+\newcount\sarftab \newcount\sarfcol \newcount\sarfcellkind  % 0 form, 1 header, 2 centred mark, 3 form+ditto
+\newif\ifsarfboxed
+\newsavebox{\sarfcellbox}\newsavebox{\sarfdittobox}
+\makeatletter
+\newcommand{\sarfcolinfo}[3]{\expandafter\xdef\csname sarf@#1@#2\endcsname{#3}}
+\def\sarf@acc#1#2{\ifcsname #1\endcsname\else\expandafter\gdef\csname #1\endcsname{0}\fi
+  \expandafter\xdef\csname #1\endcsname{\fpeval{#2}}}
+\newcommand{\sarfcellstart}{\global\advance\sarfcol\@ne\global\sarfcellkind\z@
+  \ifnum\sarfcol>\sarf@ncol\relax\xdef\sarf@ncol{\the\sarfcol}\fi
+  \begin{lrbox}{\sarfcellbox}\sarfboxedtrue}
+\newcommand{\sarfcellend}{\end{lrbox}%
+  \edef\sarf@ck{\the\sarftab @\the\sarfcol}%                       column
+  \edef\sarf@key{\sarf@ck @\ifcsname sarf@sec@\sarf@ck\endcsname\csname sarf@sec@\sarf@ck\endcsname\else0\fi}% section of it
+  \edef\sarf@w{\fpeval{\dimeval{\wd\sarfcellbox}}}%
+  %  bidi packs a cell at its natural width, so glue inside it never stretches: each cell is set
+  %  as a box exactly as wide as the column (measured on the previous pass); inside such a box the
+  %  first item lands on the right
+  \ifcase\sarfcellkind
+    \sarf@record\sarf@cell{\hskip\sarf@d\usebox{\sarfcellbox}\hfil}%
+  \or   %  a header closes the section above it: the forms below it are centred as a block of their own
+    \sarf@acc{sarf@H@\sarf@ck}{max(\csname sarf@H@\sarf@ck\endcsname,\sarf@w)}%
+    \sarf@acc{sarf@sec@\sarf@ck}{\csname sarf@sec@\sarf@ck\endcsname+1}%
+    \sarf@cell{\hfil\usebox{\sarfcellbox}\hfil}%
+  \or   %  centred mark or label: counts toward the column width like a header
+    \sarf@acc{sarf@H@\sarf@ck}{max(\csname sarf@H@\sarf@ck\endcsname,\sarf@w)}%
+    \sarf@cell{\hfil\usebox{\sarfcellbox}\hfil}%
+  \or
+    \sarf@record\sarf@cell{\hskip\sarf@d\usebox{\sarfcellbox}\hfill\hspace{.3em}\usebox{\sarfdittobox}}%
+  \fi}
+\def\sarf@cell#1{\ifcsname sarf@W@\sarf@ck\endcsname\hbox to\csname sarf@W@\sarf@ck\endcsname pt{#1}\else\usebox{\sarfcellbox}\fi}
+\def\sarf@d{\ifcsname sarf@d@\sarf@key\endcsname\csname sarf@d@\sarf@key\endcsname pt\else\z@\fi}
+\def\sarf@record{\ifdim\wd\sarfcellbox>\z@
+  \sarf@acc{sarf@N@\sarf@key}{\csname sarf@N@\sarf@key\endcsname+1}%
+  \sarf@acc{sarf@M@\sarf@key}{max(\csname sarf@M@\sarf@key\endcsname,\sarf@w)}%
+  \sarf@acc{sarf@MC@\sarf@ck}{max(\csname sarf@MC@\sarf@ck\endcsname,\sarf@w)}\fi}
+%  at the end of a table: write each column's width and each section's inset for the next pass
+\newcount\sarf@c \newcount\sarf@s
+\newcommand{\sarfwritecols}{\setbox\z@\hbox{\sarfwritecols@}}%   (in a discarded box: its spaces must not widen the table)
+\newcommand{\sarfwritecols@}{\sarf@c\z@
+  \loop\ifnum\sarf@c<\sarf@ncol\relax\advance\sarf@c\@ne
+    \edef\sarf@ck{\the\sarftab @\the\sarf@c}%
+    \ifcsname sarf@MC@\sarf@ck\endcsname\else\ifcsname sarf@H@\sarf@ck\endcsname
+      \expandafter\gdef\csname sarf@MC@\sarf@ck\endcsname{0}\fi\fi
+    \ifcsname sarf@MC@\sarf@ck\endcsname
+      \edef\sarf@W{\fpeval{max(\csname sarf@MC@\sarf@ck\endcsname,\ifcsname sarf@H@\sarf@ck\endcsname\csname sarf@H@\sarf@ck\endcsname\else0\fi)}}%
+      \immediate\write\@auxout{\string\sarfcolinfo{W}{\sarf@ck}{\fpeval{round(\sarf@W+.01,2)}}}%
+      {\sarf@s\z@
+      \loop\edef\sarf@key{\sarf@ck @\the\sarf@s}%
+        \ifcsname sarf@M@\sarf@key\endcsname   %  inset that centres the section's block of forms
+          \immediate\write\@auxout{\string\sarfcolinfo{d}{\sarf@key}{\fpeval{round(max(0,(\sarf@W-\csname sarf@M@\sarf@key\endcsname)/2),2)}}}%
+        \fi
+        \advance\sarf@s\@ne
+      \ifnum\sarf@s<\fpeval{\ifcsname sarf@sec@\sarf@ck\endcsname\csname sarf@sec@\sarf@ck\endcsname\else0\fi+1}\relax\repeat}
+    \fi\repeat}
+\newcommand{\sarftablestart}{\global\advance\sarftab\@ne\gdef\sarf@ncol{0}\global\sarfcol\z@\let\multicolumn\sarf@multicolumn
+  \gdef\sarf@pad{0}\ifintables\else\ifincol\else\if1\sarfstandalone\sarf@widen\fi\fi\fi}
+%  Free-standing tables are widened to the frame (extra cell padding, up to \sarfpadcap), so that
+%  tables sharing a page come out the same width and none is squeezed (measured on the previous
+%  pass: \sarfwidth{unit}{page}{natural width}{columns}).
+\def\sarfstandalone{0}
+\newcommand{\sarfwidth}[4]{\expandafter\xdef\csname sarf@ww@#1\endcsname{#3}\expandafter\xdef\csname sarf@wn@#1\endcsname{#4}%
+  \ifcsname sarf@WM@#2\endcsname\else\expandafter\gdef\csname sarf@WM@#2\endcsname{0}\fi
+  \expandafter\xdef\csname sarf@WM@#2\endcsname{\fpeval{max(\csname sarf@WM@#2\endcsname,#3)}}%
+  \expandafter\xdef\csname sarf@wp@#1\endcsname{#2}}
+\newcommand{\sarfwiden}{1.12}   % a table may be widened to at most 12% beyond the widest table on its page
+\def\sarf@widen{\ifcsname sarf@ww@\sarfid\endcsname\ifx\sarfK\@empty\else
+  %  target: as wide as the widest table on the page, loosened a little (never beyond the frame
+  %  at this page's type size); tables much narrower than the widest are left alone
+  \edef\sarf@WMp{\csname sarf@WM@\csname sarf@wp@\sarfid\endcsname\endcsname}%
+  \edef\sarf@target{\fpeval{max(\sarf@WMp,min(\dimeval{\linewidth}/\sarfK,\sarfwiden*\sarf@WMp))}}%
+  \edef\sarf@wme{\csname sarf@ww@\sarfid\endcsname}%
+  \ifnum\csname sarf@wn@\sarfid\endcsname>\z@\ifdim\sarf@wme pt>.45\dimexpr\sarf@WMp pt\relax
+    \xdef\sarf@pad{\fpeval{round(max(0,(\sarf@target-\sarf@wme)/(2*\csname sarf@wn@\sarfid\endcsname)),2)}}%
+    \advance\tabcolsep\sarf@pad pt\relax
+  \fi\fi\fi\fi}
+%  \multicolumn bypasses the column template: keep the column count right
+\let\sarf@mc\multicolumn
+\def\sarf@multicolumn#1#2#3{\sarf@mc{#1}{#2}{\global\advance\sarfcol#1\relax#3}}
+\makeatother
+\ExplSyntaxOn
+\cs_new_protected:Npn \sarfspec #1
+  { \tl_set:Nn \sarfSpec {#1}
+    \legacy_if:nF { incol }
+      { \tl_replace_all:Nnn \sarfSpec { c } { \sarfBOXED }
+        \tl_replace_all:Nnn \sarfSpec { r } { \sarfBOXED }
+        \tl_replace_all:Nnn \sarfSpec { \sarfBOXED } { >{\sarfcellstart}r<{\sarfcellend} } } }
+\ExplSyntaxOff
+\def\sarftabular{\begin{tabular}}
+\newsavebox{\sarfbox}
+\newsavebox{\sarfinner}
+\newenvironment{sarf}[1]{\ifintables\else\ifincol\par\centering\else\envensurenumbering{sarf}\sarfunit\gdef\sarfstandalone{1}\pstart\centering\fi\fi
+   \begin{lrbox}{\sarfinner}\sarftablestart\small\booktabsrules\sarfhairlines\ifincol\else\renewcommand{\arraystretch}{\sarfS}\fi\sarfspec{#1}\expandafter\sarftabular\expandafter{\sarfSpec}\sarfcentre\ifintables\else\toprule\fi}%
+  {\ifintables\else\bottomrule\fi\end{tabular}\sarfwritecols\end{lrbox}%
+   \ifintables\tablessep\ifinstack\usebox{\sarfinner}\else\raisebox{-\ht\sarfinner}{\usebox{\sarfinner}}\fi
+   \else\sbox{\sarfbox}{\usebox{\sarfinner}}\sarfplace\par\ifincol\else\pend\fi\fi}
+\newsavebox{\sarfboxb}
+\newlength{\sarfmaxheight}
+%  lines of the page kept free below a table scaled to the page height (heading, apparatus);
+%  \tablereserve{9} after \mspage raises it for pages with a long apparatus. Reset by \mspage.
+\newcommand{\sarfreserve}{5}
+\newcommand{\tablereserve}[1]{\gdef\sarfreserve{#1}}
+%  place the boxed table: shrink to the line width, then (if still too tall) to the page height
+\newcommand{\sarfplacedown}{%
+  \setlength{\sarfmaxheight}{\dimexpr\textheight-\sarfreserve\baselineskip\relax}%
+  \ifdim\wd\sarfbox>\linewidth
+    \sbox{\sarfboxb}{\resizebox{\linewidth}{!}{\usebox{\sarfbox}}}%
+  \else
+    \sbox{\sarfboxb}{\usebox{\sarfbox}}%
+  \fi
+  \ifdim\dimexpr\ht\sarfboxb+\dp\sarfboxb\relax>\sarfmaxheight
+    \resizebox*{!}{\sarfmaxheight}{\usebox{\sarfboxb}}%   (* = total height incl. depth)
+  \else
+    \usebox{\sarfboxb}%
+  \fi}
+
+%  ---- auto-fill: the lithograph's tables fill its frame. All tables of a page share ONE type
+%  size (the largest at which every one of them fits the frame width, never above natural size)
+%  and ONE row height; the space the page had left on the previous pass goes into taller rows
+%  (\arraystretch between \sarfminS, which leaves room for the vowel marks, and \sarfmaxS).
+%  If the tables do not fit even at \sarfminS, the page's type size is lowered instead.
+%  Data travel through the .aux:  \sarfdata{unit}{page}{stretch}{natural ht}{width-bound scale}{placed ht}
+%  and \pagefree{page}{free space}; all lengths in pt.  Needs several passes (see Makefile).
+\newcommand{\sarfcap}{1}         % largest up-scaling of a table's type (1 = natural size)
+\newcommand{\sarfminS}{2}     % row height range
+\newcommand{\sarfmaxS}{3}
+\newcommand{\sarfdefS}{2}
+\newcommand{\sarffillmargin}{6}  % pt left free on each page, against rounding
+\newcounter{sarfunits}
+\def\sarfS{\sarfdefS}\def\sarfK{}
+\makeatletter
+\def\sarf@add#1#2{\ifcsname #1\endcsname\else\expandafter\gdef\csname #1\endcsname{0}\fi
+  \expandafter\xdef\csname #1\endcsname{\fpeval{\csname #1\endcsname+#2}}}
+\newcommand{\sarfdata}[6]{%
+  \expandafter\xdef\csname sarf@p@#1\endcsname{#2}\expandafter\xdef\csname sarf@S@#1\endcsname{#3}%
+  \sarf@add{sarf@T@#2}{#6}%                    tables' placed height on the page
+  \sarf@add{sarf@A@#2}{#4/#3}%                 natural height per unit of row stretch
+  \ifcsname sarf@KW@#2\endcsname\else\expandafter\gdef\csname sarf@KW@#2\endcsname{\sarfcap}\fi
+  \expandafter\xdef\csname sarf@KW@#2\endcsname{\fpeval{min(\csname sarf@KW@#2\endcsname,#5)}}}
+\newcommand{\pagefree}[2]{\expandafter\xdef\csname sarf@F@#1\endcsname{#2}}
+\def\sarf@pv#1{\csname sarf@#1@\sarf@pg\endcsname}
+%  start a placement unit (a lone table, a `tables` row, a `stack`): fix the page's type size and row height
+\newcommand{\sarfunit}{\stepcounter{sarfunits}\edef\sarfid{\thesarfunits}%
+  \def\sarfS{\sarfdefS}\def\sarfK{}%
+  \ifcsname sarf@p@\sarfid\endcsname
+    \edef\sarf@pg{\csname sarf@p@\sarfid\endcsname}%
+    \ifcsname sarf@F@\sarf@pg\endcsname
+      \edef\sarf@avail{\fpeval{\sarf@pv{T}+\sarf@pv{F}-\sarffillmargin}}%
+      \edef\sarfK{\fpeval{min(\sarf@pv{KW},\sarf@avail/(\sarfminS*\sarf@pv{A}))}}%
+      \edef\sarf@old{\csname sarf@S@\sarfid\endcsname}%
+      \edef\sarfS{\fpeval{round(max(\sarfminS,min(\sarfmaxS,
+          \sarf@old+.85*(\sarf@avail/(\sarfK*\sarf@pv{A})-\sarf@old))),3)}}%
+    \fi
+  \fi}
+\newcommand{\sarfplace}{%
+  \ifincol\sarfplacedown\else
+    \edef\sarf@h{\fpeval{\dimeval{\ht\sarfbox+\dp\sarfbox}}}%
+    \edef\sarf@kw{\fpeval{min(\sarfcap,\dimeval{\linewidth}/(\dimeval{\wd\sarfbox}-\if1\sarfstandalone 2*\sarf@ncol*\sarf@pad\else0\fi))}}%   (unpadded)
+    \edef\sarf@kfit{\fpeval{\dimeval{\linewidth}/\dimeval{\wd\sarfbox}}}%
+    \ifx\sarfK\@empty
+      \edef\sarf@k{\fpeval{min(\sarf@kw,\sarf@kfit,\dimeval{\textheight-\sarfreserve\baselineskip}/\sarf@h)}}%
+    \else
+      \edef\sarf@k{\fpeval{min(\sarfK,\sarf@kw,\sarf@kfit,\dimeval{\textheight-2\baselineskip}/\sarf@h)}}%
+    \fi
+    \scalebox{\sarf@k}{\usebox{\sarfbox}}%
+    \immediate\write\@auxout{\string\sarfdata{\sarfid}{\themspages}{\sarfS}{\sarf@h}{\sarf@kw}{\fpeval{\sarf@k*\sarf@h}}}%
+    \if1\sarfstandalone\immediate\write\@auxout{\string\sarfwidth{\sarfid}{\themspages}{\fpeval{round(\dimeval{\wd\sarfbox}-2*\sarf@ncol*\sarf@pad,2)}}{\sarf@ncol}}%
+    \else\immediate\write\@auxout{\string\sarfwidth{\sarfid}{\themspages}{\fpeval{round(\dimeval{\wd\sarfbox},2)}}{0}}\fi%   (a row of tables sets the width but is not widened)
+  \fi}
+%  free space left on the page just finished (minus whole sheets it spilled onto)
+\newcount\sarf@startabs
+\newcommand{\recordpagefree}{\ifnum\value{mspages}>0 \par\penalty\@M
+  \immediate\write\@auxout{\string\pagefree{\themspages}{\fpeval{%
+    (\ifdim\pagegoal=\maxdimen\dimeval{\textheight}\else\dimeval{\pagegoal-\pagetotal-\pagedepth}\fi)
+    -(\number\value{msabspage}-\number\sarf@startabs)*\dimeval{\textheight}}}}\fi}
+\newcommand{\markpagestart}{\global\sarf@startabs=\value{msabspage}}
+\makeatother
+\AtEndDocument{\finishnumbering\recordpagefree}
+
+%  Several tables side by side, as the lithograph often sets them:
+%    \begin{tables} \begin{sarf}{..}..\end{sarf} \begin{sarf}{..}..\end{sarf} \end{tables}
+%  (tables are listed right-to-left; the row is scaled to the text width/height if needed)
+\newif\ifintables \newif\ifincol \newif\ifinstack
+\newsavebox{\tablesbox}
+%  The tables of a row are joined into one grid, as in the lithograph: common top and bottom
+%  rules, a thin vertical rule between neighbours (the shorter ones leave space at their foot).
+\newif\iffirstintables
+\newcommand{\tablessep}{\unskip\iffirstintables\global\firstintablesfalse\else\vrule width\lightrulewidth\fi}
+\newenvironment{tables}{\envensurenumbering{tables}\sarfunit\gdef\sarfstandalone{0}\pstart\centering\begin{lrbox}{\tablesbox}\intablestrue\global\firstintablestrue\ignorespaces}%
+  {\unskip\end{lrbox}\intablesfalse
+   \sbox{\sarfbox}{\vbox{\hrule height\heavyrulewidth\hbox{\usebox{\tablesbox}}\hrule height\heavyrulewidth}}\sarfplace\par\pend}
+\newcommand{\tablesgap}{}
+%  Tables stacked one above the other and scaled together to the page (when two full-width
+%  tables would each fit alone but not both):  \begin{stack} \begin{sarf}..\end{sarf} \\ \begin{sarf}..\end{sarf} \end{stack}
+\newenvironment{stack}{\envensurenumbering{stack}\sarfunit\gdef\sarfstandalone{0}\pstart\centering\begin{lrbox}{\tablesbox}\intablestrue
+  \renewcommand{\tablessep}{}\instacktrue\renewcommand{\arraystretch}{0}\begin{tabular}{@{}c@{}}\toprule}%
+  {\\\bottomrule\end{tabular}\end{lrbox}\intablesfalse\sbox{\sarfbox}{\usebox{\tablesbox}}\sarfplace\par\pend}
+%  Two-column page (as the lithograph sets pp. 63–83):
+%    \begin{twocol} \begin{rightcol} text \par text \begin{sarf}..\end{sarf} .. \end{rightcol}
+%                   \begin{leftcol}  .. \end{leftcol} \end{twocol}
+%  Inside a column do NOT use \pstart/\pend: the whole column is one numbered block
+%  (reledpar), items are separated by \par. Tables, \bab and \subbab work inside.
+%  Nothing may follow \end{twocol} on the same page except another \mspage.
+\makeatletter
+%  (\endnumbering must run outside the environment's own group, hence the \endgroup dance)
+\newenvironment{twocol}{\endgroup\finishnumbering\begingroup\def\@currenvir{twocol}\begin{pairs}}{\end{pairs}\Columns\global\mspendingtrue}
+\makeatother
+\newenvironment{rightcol}{\begin{Rightside}\beginnumbering\pstart\usepagefontsize\incoltrue\noindent\ignorespaces}{\par\incolfalse\pend\endnumbering\end{Rightside}}
+\newenvironment{leftcol}{\begin{Leftside}\beginnumbering\pstart\usepagefontsize\incoltrue\noindent\ignorespaces}{\par\incolfalse\pend\endnumbering\end{Leftside}}
+%  reledpar sets the two columns line by line, so a tall table in one column pads the other.
+%  For columns holding tables of unequal height use rightbox/leftbox instead of rightcol/leftcol:
+%  each column then flows independently (its apparatus cites the column as one line).
+\newenvironment{rightbox}{\begin{rightcol}\begin{minipage}[t]{\Rcolwidth}\usepagefontsize\vspace{0pt}}{\end{minipage}\end{rightcol}}
+\newenvironment{leftbox}{\begin{leftcol}\begin{minipage}[t]{\Lcolwidth}\usepagefontsize\vspace{0pt}}{\end{minipage}\end{leftcol}}
+%  A block of prose set beside tables inside \begin{tables}: \sidetext{<width>}{<text>}
+\newcommand{\sidetext}[2]{\tablessep\raisebox{-\height}{\hspace{4pt}\parbox[t]{#1}{\vspace{3pt}\small #2\par\vspace{3pt}}\hspace{4pt}}}
+%  Prose paragraph helper for Urdu blocks
+\newenvironment{urduprose}{\envensurenumbering{urduprose}\begin{urdu}\urdufont\setlength{\baselineskip}{2em}}{\end{urdu}}

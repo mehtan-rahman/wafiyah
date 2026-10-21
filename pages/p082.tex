@@ -1,0 +1,67 @@
+% p.82 — الباب الرابع والثلاثون في قوانين التعليل وغيره (تابع: أمثلة التعليل 9–18)
+% Layout: twocol; each numbered item has a narrow sub-column on its RIGHT listing the example words
+% beside the explanation, transcribed as (n) <margin words> \\ <explanation>.
+% Right column: items 9–11 and item 12 up to «الرفع والجر واما»; left column: rest of 12
+% («فى حالة الفتحة …») and items 13–18. Item 18 breaks off and continues on p.83.
+%  \margwords{<words>}: the example words of an item, separated by \\, stacked in the narrow
+%  sub-column on the RIGHT of the explanation as the lithograph sets them: the first word (with
+%  the item number) opens the first line, the others hang beneath it beside the next lines of the
+%  paragraph (one line per word), and the remaining lines run the full column width.
+%  (local definition, identical in p081–p083; guarded so the preamble may take it over)
+\ifdefined\margwords\else
+\newdimen\margw \newdimen\margwa \newcount\margn
+\def\margstack#1\\#2\margend{\global\advance\margn by 1 \margline{#1}%
+  \if\relax\detokenize{#2}\relax\else\margstack#2\margend\fi}
+\def\margfirst#1\\#2\margend{#1}
+\def\margwords#1{%
+  \global\margn=0 \def\margline##1{\ifnum\margn>1 \hbox{##1}\fi}%
+  \setbox0=\vbox{\hbox{}\margstack#1\\\margend}\margw=\wd0
+  \setbox0=\hbox{\margfirst#1\\\margend}\margwa=\wd0 \ifdim\margw>\margwa \margwa=\margw\fi
+  \global\margn=0 \def\margline##1{\hbox to\margwa{##1\hss}}%
+  \setbox0=\vtop{\margstack#1\\\margend}\dp0=0pt
+  \advance\margw by .5em \advance\margwa by .5em
+  \edef\margshape{0pt \the\hsize}\count255=\margn
+  \loop\ifnum\count255>1 \edef\margshape{\margshape\space 0pt \the\dimexpr\hsize-\margw\relax}%
+    \advance\count255 by -1 \repeat
+  \count255=\margn \advance\count255 by 1
+  \parshape\count255 \margshape\space 0pt \the\hsize
+  \noindent\vrule width0pt height0pt\hbox to\margwa{\box0\hss}\vrule width0pt height0pt\ignorespaces}
+\fi
+\mspage{82}
+\enlargethispage{\baselineskip}% the right column is one line longer than the A5 text block
+\begin{twocol}
+\begin{rightcol}
+\margwords{(9) قُلْ\\بِعْ\\جِئْ\\لَا تَقُلْ\\لَا تَبِعْ\\لَا تَجِئْ}
+اصله اُقْوُلْ نقل حركة الواو الى القاف كما مر انفا فحذف همزة الوصل لعدم الاحتياج والتقى الساكنان فحذف الواو فصار قل كذالك فى بِعْ اصله اِبْيِعْ وفى جِئْ اصله اِجْيِئْ كذالك تقول فى لَا تَقُلْ اصله لَا تَقْوُلْ وفى لَا تَبِعْ اصله لَا تَبْيِعْ وفى لَا تَجِئْ اصله لَا تَجْيِئْ
+\par
+\margwords{(10) اَعِنْ\\لَا تُعِنْ}
+اصله اَعْوِنْ نقل حركة الواو الى العين ثم حذف الواو للالتقاء الساكنين كذالك تقول فى لَا تُعِنْ اصله لَا تُعْوِنْ
+\par
+\margwords{(11) اُدْعُ\\اِرْمِ\\اِخْشَ\\لَا تَدْعُ\\لَا تَرْمِ}
+اصله اُدْعُوْ حذف الواو علامة للسكون لان حذف حرف العلة علامة فى الناقص المفرد كذالك تقول فى اِرْمِ اصله اِرْمِىْ وفى اِخْشَ اصله اِخْشٰى كذالك فى لَا تَدْعُ ولَا تَرْمِ و لَا تَخْشَ ولَمْ يَدْعُ وَلَمْ يَرْمِ وَلَمْ يَخْشَ
+\par
+\margwords{(12) دَاعٍ\\رَامٍ\\مُعْطٍ\\مُؤْتٍ\\غَازٍ}\looseness=-1 % layout: tighten so the page fits
+اصله دَاعِوٌ اذا وقع الواو حرفا رابعا بعد اَنْ كان حرفا ثالثا وكان حركة ما قبلها غير مطابق لها فيبدل الواو ياءً للتخفيف فصار دَاعِيٌ ثم حذف الضمة فصار دَاعِيْ باظهار نون التنوين ثم حذف الياء لالتقاء الساكنين فصار دَاعِنْ لكن يكتب داع فى حالة الرفع والجر واما
+\end{rightcol}
+\begin{leftcol}
+فى حالة الفتحة لا تحذف الياء لخفة الفتحة فتقول دَاعِيًا كذالك تقول فى رَامٍ اصله رَامِيٌ واصل معطٍ مُعْطِيٌ ومُؤْتٍ مُوتِيٌ و غَازٍ غَازِوٌ
+\par
+\margwords{(13) مُؤْتًى\\مُعْطًى}
+اصله مُؤْتَيٌ حذف الضمة للثقل ثم بدل الياء الفا للمناسبة فتحة ما قبلها فصار مُؤْتَانْ ثم حذف الالف للالتقاء فصار مُؤْتًى كذالك معطًى اصله مُعْطَيٌ
+\par
+\margwords{(14) يَدْعُوْ}
+اصله يَدْعُوُ حذف حركة الواو للتخفيف كذالك يَرْمِىْ يَخْشٰى
+\par
+\margwords{(15) يُدْعٰى\\يُرْمٰى}
+اصله يُدْعَوُ بدل الواو ياءً كما مر فى دَاعٍ فصار يُدْعَىُ ثم حذف الحركة للثقل ثم بدل الفا للفتحة كذالك تقول فى يُرْمٰى اصله يُرْمَىُ
+\par
+\margwords{(16) قِيْلَ\\بِيْعَ\\خِيْفَ}
+اصله قُوِلَ حذف ضمة القاف لان الخروج من الضمة الى الكسرة قبيح و نقل حركة الواو الى القاف ثم بدل الواو ياءً كذالك تقول فى بِيْعَ اصله بُيِعَ واصل خِيْفَ خُوِفَ
+\par
+\margwords{(17) دُعِىَ\\رَضِىَ}
+اصله دُعِوَ بدل الواو ياءً لمناسبة الكسرة كذالك فى رَضِىَ اصله رَضِوَ
+\par
+\margwords{(18) قُلْنَ}
+ماضى مؤنث غائب اصله قَوَلْنَ
+\end{leftcol}
+\end{twocol}

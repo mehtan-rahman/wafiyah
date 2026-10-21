@@ -1,0 +1,72 @@
+% p.83 — الباب الرابع والثلاثون في قوانين التعليل وغيره (تابع: أمثلة التعليل 18–28)
+% Layout: twocol; each numbered item has a narrow sub-column on its RIGHT listing the example words
+% beside the explanation, transcribed as (n) <margin words> \\ <explanation>.
+% Right column: end of item 18 (margin بِعْنَ خِفْنَ), items 19–22 and item 23 up to «ثم حذف الياء»;
+% left column: rest of 23 («للالتقاء ثم بدل …») and items 24–28. A small ornament closes the
+% left column after item 28.
+%  \margwords{<words>}: the example words of an item, separated by \\, stacked in the narrow
+%  sub-column on the RIGHT of the explanation as the lithograph sets them: the first word (with
+%  the item number) opens the first line, the others hang beneath it beside the next lines of the
+%  paragraph (one line per word), and the remaining lines run the full column width.
+%  (local definition, identical in p081–p083; guarded so the preamble may take it over)
+\ifdefined\margwords\else
+\newdimen\margw \newdimen\margwa \newcount\margn
+\def\margstack#1\\#2\margend{\global\advance\margn by 1 \margline{#1}%
+  \if\relax\detokenize{#2}\relax\else\margstack#2\margend\fi}
+\def\margfirst#1\\#2\margend{#1}
+\def\margwords#1{%
+  \global\margn=0 \def\margline##1{\ifnum\margn>1 \hbox{##1}\fi}%
+  \setbox0=\vbox{\hbox{}\margstack#1\\\margend}\margw=\wd0
+  \setbox0=\hbox{\margfirst#1\\\margend}\margwa=\wd0 \ifdim\margw>\margwa \margwa=\margw\fi
+  \global\margn=0 \def\margline##1{\hbox to\margwa{##1\hss}}%
+  \setbox0=\vtop{\margstack#1\\\margend}\dp0=0pt
+  \advance\margw by .5em \advance\margwa by .5em
+  \edef\margshape{0pt \the\hsize}\count255=\margn
+  \loop\ifnum\count255>1 \edef\margshape{\margshape\space 0pt \the\dimexpr\hsize-\margw\relax}%
+    \advance\count255 by -1 \repeat
+  \count255=\margn \advance\count255 by 1
+  \parshape\count255 \margshape\space 0pt \the\hsize
+  \noindent\vrule width0pt height0pt\hbox to\margwa{\box0\hss}\vrule width0pt height0pt\ignorespaces}
+\fi
+\mspage{83}
+\densepage{9.5}
+\begin{twocol}
+\begin{rightcol}
+\margwords{بِعْنَ\\خِفْنَ}
+حذف حركة الواو للثقل وبدل الواو الفا للفتحة ثم حُذِفَتْ للالتقاء ثم ضم القاف للدلالة على الواو المحذوفة كذالك بِعْنَ اصله بَيَعْنَ ثُمَّ كسرت الباء للدلالة على الياء واصل خِفْنَ خَوِفْنَ وكسرت الخاء للدلالة على الكسرة المحذوفة وللدلالة على انه على باب سَمِعَ لا على باب كَرُمَ ولا فَتَحَ
+\par
+\margwords{(19) قُلْنَ\\بِعْنَ\\خِفْنَ}
+اصله قُوِلْنَ حذف الكسرة ثم الواو اصله بُيِعْنَ تعليله مثل تعليل قِيْلَ اصله خُوِفْنَ تعليله مثل تعليل قِيْلَ
+\par
+\margwords{(20) قُلْنَ\\بِعْنَ}
+اصله اُقْوُلْنَ تعليله مثل تعليل قُلْ اصله اِبْيِعْنَ تعليله مثل تعليل قُلْ
+\par
+\margwords{(21) دَعَتْ\\رَمَتْ}
+اصله دَعَوَتْ تعليله مثل تعليل دَعَا لكن لما الحق معه التاء الساكنة التقى الساكنان فحذف الالف كذالك تقول فى رَمَتْ اصله رَمَيَتْ
+\par
+\margwords{(22) دَعَتَا}
+اصله دَعَوَتَا لم يرجع الالف المحذوفة مع عدم الالتقاء اتباعًا لِدَعَتْ
+\par
+\margwords{(23) يَدْعُوْنَ\\يَرْمُوْنَ}
+اصله يَدْعُوُوْنَ حذف حركة الواو للثقل ثم حذف الواو للالتقاء كذالك يَرْمُوْنَ اصله يَرْمِيُوْنَ حذف الحركة ثم حذف الياء
+\end{rightcol}
+\begin{leftcol}
+للالتقاء ثم بدل الكسرة ضمة لمناسبة الواو
+\par
+\margwords{(24) يَدْعِيْنَ\\يَرْمِيْنَ}
+اصله يَدْعُوِيْنَ حذف الحركة ثم الواو ثم بدل الضمة كسرة كذالك يَرْمِيْنَ اصله يَرْمِيِيْنَ
+\par
+\margwords{(25) يُدْعَوْنَ\\يُرْمَوْنَ}
+اصله يُدْعَوُوْنَ حذف الحركة ثم الواو وكذالك يُرْمَوْنَ اصله يُرْمَيُوْنَ
+\par
+\margwords{(26) جَاءٍ\\شَاءٍ}
+اصله جايِئٌ نُقِلَ الهمزة الى العين والياء الى اللام فصار جَائِيٌ للتخفيف ولمناسبة الالف ثم فعل كما فعل فى \unclear{كَاعٍ} كذالك شاءٍ اصله شايِئٌ
+% TODO: «كَاعٍ» looks like a misprint for «دَاعٍ» (cf. item 12 on p.82).
+\par
+\margwords{(27) يَرٰى}
+اصله يَرْأَىُ حذف ضمة الياء للثقل ثم بدل الفا للمناسبة فصار يَرْأَا ثم \com{بُيِّنَتِ}{كذا في الأصل، ولعل الصواب: لُيِّنَتِ} الهمزة اى اسكنت فاجتمع ثلاث سواكن فى الراء وفى الالفين فاعطى حركة التى كانت فى الهمزة فصار يَرَاا وحذف الف واحد للالتقاء فصار يَرٰى
+\par
+\margwords{(28) تَرَيْنَ}
+اصله تَرْأَيِيْنَ حذف حركة الياء ثم بدل الفا فصار \unclear{تَرْأَايْنَ} فحذف الالف فصار تَرْأَيْنَ ثم اعطى حركة الهمزة للراء للتخفيف فصار تَرَأْيْنَ ثم حذف الالف فصار تَرَيْنَ
+\end{leftcol}
+\end{twocol}

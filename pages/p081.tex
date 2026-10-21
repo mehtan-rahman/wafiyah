@@ -1,0 +1,60 @@
+% p.81 — الباب الرابع والثلاثون في قوانين التعليل وغيره (تابع: آخر القانون 39، ثم أمثلة التعليل 1–8)
+% Layout: twocol. Each numbered item has a narrow sub-column on its RIGHT listing the example words
+% (قَالَ، بَاعَ، … / يَقُوْلُ، يَبِيْعُ، …) beside the lines of explanation to their left; transcribed as
+% (n) <margin words> \\ <explanation>. Right column: end of rule 39 («تقديرية …») and items 1–3;
+% left column: items 4–8. Numbering restarts at (1) here (worked تعليلات).
+%  \margwords{<words>}: the example words of an item, separated by \\, stacked in the narrow
+%  sub-column on the RIGHT of the explanation as the lithograph sets them: the first word (with
+%  the item number) opens the first line, the others hang beneath it beside the next lines of the
+%  paragraph (one line per word), and the remaining lines run the full column width.
+%  (local definition, identical in p081–p083; guarded so the preamble may take it over)
+\ifdefined\margwords\else
+\newdimen\margw \newdimen\margwa \newcount\margn
+\def\margstack#1\\#2\margend{\global\advance\margn by 1 \margline{#1}%
+  \if\relax\detokenize{#2}\relax\else\margstack#2\margend\fi}
+\def\margfirst#1\\#2\margend{#1}
+\def\margwords#1{%
+  \global\margn=0 \def\margline##1{\ifnum\margn>1 \hbox{##1}\fi}%
+  \setbox0=\vbox{\hbox{}\margstack#1\\\margend}\margw=\wd0
+  \setbox0=\hbox{\margfirst#1\\\margend}\margwa=\wd0 \ifdim\margw>\margwa \margwa=\margw\fi
+  \global\margn=0 \def\margline##1{\hbox to\margwa{##1\hss}}%
+  \setbox0=\vtop{\margstack#1\\\margend}\dp0=0pt
+  \advance\margw by .5em \advance\margwa by .5em
+  \edef\margshape{0pt \the\hsize}\count255=\margn
+  \loop\ifnum\count255>1 \edef\margshape{\margshape\space 0pt \the\dimexpr\hsize-\margw\relax}%
+    \advance\count255 by -1 \repeat
+  \count255=\margn \advance\count255 by 1
+  \parshape\count255 \margshape\space 0pt \the\hsize
+  \noindent\vrule width0pt height0pt\hbox to\margwa{\box0\hss}\vrule width0pt height0pt\ignorespaces}
+\fi
+\mspage{81}
+\begin{twocol}
+\begin{rightcol}
+تقديرية ولذالك يحذف الواو اذا وقع بين الياء والكسرة كما مر فى يَعِدُ
+\par
+\margwords{(1) قَالَ\\بَاعَ\\خَافَ\\طَالَ\\جَاءَ\\دَعَا\\رَمٰى}
+اصله قَوَلَ حذف حركة الواو لثقلها على حرف العلة ثم بدل الفا لمناسبة فتحة ما قبله فصار قال كذالك فى باع اصله بَيَعَ وخاف اصله خَوِفَ وطال اصله طَوُلَ وجاء اصله جَيَأَ و دَعَا اصله دَعَوَ و رَمٰى اصله رَمَىَ
+\par
+\margwords{(2) يَقُوْلُ\\يَبِيْعُ\\يَجِيْئُ}
+اصله يَقْوُلُ نقل حركة الواو الى القاف لضعف حرف العلة وقوة حرف الصّحة كما ذكر فى القانون (35) كذالك تقول فى يَبِيْعُ اصله يَبْيِعُ و فى يَجِيْئُ اصله يَجْيِئُ
+\par
+\margwords{(3) يُقَالُ\\يُبَاعُ\\اَعَانَ\\يُعِيْنُ}
+اصله يُقْوَلُ نقل حركة الواو الى القاف ثم بدل الواو الفا للمناسبة الفتحة فصار يُقَالُ كما ذكر فى قانون (35) كذالك تقول فى يُبَاعُ اصله يُبْيَعُ وفى اَعَانَ اصله اَعْوَنَ وفى اُعِيْنَ اصله اُعْوِنَ و فى يُعِيْنُ اصله يُعْوِنُ
+\end{rightcol}
+\begin{leftcol}
+\margwords{(4) قَائِلٌ\\بَائِعٌ}
+اصله قَاوِلٌ حذف حركة الواو للثقل ثم بدل الفا للمناسبة ما قبلها فالتقى الالفان فاعطى الكسرة للالف فصار همزة قائل لان الهمزة الف مع الحركة واذا ازيل الحركة عن الهمزة فتكون الفا كذالك تقول فى بَائِعٌ اصله بَايِعٌ
+\par
+\margwords{(5) مَقُوْلٌ}
+اصله مَقْوُوْلٌ نقل حركة الواو الى القاف فالتقى الساكنان فحذف احدى الواوين فصار مَقُوْلٌ
+\par
+\margwords{(6) مَبِيْعٌ\\مَجِيْئٌ}
+اصله مَبْيُوْعٌ نقل حركة الياء الى الباء فالتقى الساكنان فحذف الواو فصار مَبُيْعٌ ولا يجوز الخروج من الضمة الى الكسرة كما فى قانون (38) فبدل الضمة كسرة لانه اجوف يائى ولذا لم يبدل الياء واوًا للمناسبة فيصير ملتبسًا بالاجوف الواوى كما فى مَقُوْلٍ كذالك تقول فى مَجِيْئٌ اصله مَجْيُوْءٌ
+\par
+\margwords{(7) مَدْعُوٌّ}
+اصله مَدْعُوْوٌ ادغم الواو فى الواو للجنسية
+\par
+\margwords{(8) مَرْمِيٌّ\\مَوْقِيٌّ}
+اصله مَرْمُوْيٌ اذا اجتمع الواو والياء وكان الاول ساكنا يبدل الواو ياء للتخفيف ثم ادغم للجنسية ثم بدل الضمة كسرة لمناسبة الياء ولكونه ناقصا يائيا كذالك تقول فى مَوْقِيٌّ اصله مَوْقُوْيٌ
+\end{leftcol}
+\end{twocol}
